@@ -1,5 +1,5 @@
 package common.utils
 
-import java.time.Duration
+import kotlin.time.Duration
 
-val DURATION_INFINITE = Duration.ofNanos(-1)
+val DURATION_INFINITE = Duration.INFINITE

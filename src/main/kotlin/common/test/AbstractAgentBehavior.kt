@@ -1,12 +1,17 @@
+@file:Suppress("UNCHECKED_CAST")
+
 package common.test
 
-import common.interfaces.Agent
-import common.interfaces.Behaviour
-import common.interfaces.DirectoryFacilitator
+import common.implementation.RepositoryImpl
+import common.interfaces.*
 import common.message.Message
 import kotlinx.coroutines.delay
+import java.util.*
 
-abstract class AbstractAgentBehavior(protected val x: Float) : Behaviour {
+abstract class AbstractAgentBehavior<T>(
+    protected val x: T,
+    private val checker: MutableList<Check<Any>> = mutableListOf()
+) : BehaviourWithRepository {
 
     companion object {
 
@@ -19,6 +24,11 @@ abstract class AbstractAgentBehavior(protected val x: Float) : Behaviour {
 
     private val appropriateIds = mutableListOf<String>()
     private val inappropriateIds = mutableListOf<String>()
+    private val repository = RepositoryImpl<Message>()
+
+    override fun getRepository(): Optional<Repository<Message>> {
+        return Optional.of(repository);
+    }
 
     override suspend fun onReceive(message: Message, agent: Agent, mts: DirectoryFacilitator) {
         if (appropriateIds.contains(message.senderId)) {
@@ -29,25 +39,28 @@ abstract class AbstractAgentBehavior(protected val x: Float) : Behaviour {
         }
         delay(1000)
         when (message.code) {
-            CODE_CHECK -> if (check(message.data as Float)) {
+            CODE_CHECK -> if (check(message.data as T)) {
                 println("Accepted by  ${message.receiverId}")
                 mts.send(Message(agent.identifier, message.senderId, x, CODE_HAND_SHAKE))
             } else {
                 mts.send(Message(agent.identifier, message.senderId, code = CODE_ERROR))
                 mts.send(Message(agent.identifier, endpoint(mts), code = CODE_CHECK, data = x))
             }
-            CODE_HAND_SHAKE -> if (check(message.data as Float)) {
+
+            CODE_HAND_SHAKE -> if (check(message.data as T)) {
                 mts.send(Message(agent.identifier, message.senderId, code = CODE_SUBMIT_HAND_SHAKE))
             } else {
                 mts.send(Message(agent.identifier, message.senderId, code = CODE_ERROR))
                 mts.send(Message(agent.identifier, endpoint(mts), code = CODE_CHECK, data = x))
             }
+
             CODE_SUBMIT_HAND_SHAKE -> {
                 println("Submitted by ${message.senderId}")
                 appropriateIds.add(message.senderId)
                 mts.send(Message(agent.identifier, message.senderId, code = CODE_SUBMIT_HAND_SHAKE, data = x))
                 mts.send(Message(agent.identifier, endpoint(mts), code = CODE_CHECK, data = x))
             }
+
             CODE_ERROR -> {
                 println("Denied by ${message.senderId}")
                 inappropriateIds.add(message.senderId)
@@ -59,6 +72,8 @@ abstract class AbstractAgentBehavior(protected val x: Float) : Behaviour {
 
     protected abstract fun endpoint(mts: DirectoryFacilitator): String
 
-    protected abstract fun check(x: Float): Boolean
+    protected fun check(x: T): Boolean {
+        return checker.stream().allMatch { check -> check.test(x as Any) }
+    }
 
 }

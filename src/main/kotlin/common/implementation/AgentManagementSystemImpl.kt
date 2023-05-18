@@ -1,16 +1,18 @@
+@file:OptIn(DelicateCoroutinesApi::class)
+
 package common.implementation
 
 import common.interfaces.*
 import common.message.Message
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ChannelResult
 import kotlinx.coroutines.channels.SendChannel
-import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.selects.SelectClause2
-import java.time.Duration
 import kotlin.coroutines.CoroutineContext
+import kotlin.time.Duration
 
 class AgentManagementSystemImpl(
     override val messageTransportService: MessageTransportService,
@@ -19,11 +21,10 @@ class AgentManagementSystemImpl(
     override val capacity: Int = Channel.CONFLATED
 ) : AgentManagementSystem {
 
-    private val subscription = messageTransportService.openSubscription()
-    private val innerDFAgent = BaseDFAgent.DFAgentImpl("MAIN", coroutineContext, capacity, this)
+    private var innerDFAgent: BaseDFAgent = BaseDFAgent.DFAgentImpl("MAIN", coroutineContext, capacity, this)
 
     init {
-        launch(Dispatchers.IO) { subscription.consumeEach { innerDFAgent.send(it) } }
+        launch { messageTransportService.collect { innerDFAgent.send(it) } }
     }
 
     override fun get(agentId: String): Agent = innerDFAgent[agentId]
@@ -45,24 +46,19 @@ class AgentManagementSystemImpl(
         innerDFAgent.agent(agent)
     }
 
-    override suspend fun agent(name: String, capicity: Int, lifecycle: Duration, behaviour: Behaviour) {
-        innerDFAgent.agent(name, capicity, lifecycle, behaviour)
+    override suspend fun agent(name: String, capacity: Int, lifecycle: Duration, behaviour: BehaviourWithRepository) {
+        innerDFAgent.agent(name, capacity, lifecycle, behaviour)
     }
 
     override val identifier: String
         get() = name
 
-
     override val parent: DirectoryFacilitator
         get() = this
 
-    @ExperimentalCoroutinesApi
+
     override val isClosedForSend: Boolean
         get() = innerDFAgent.isClosedForSend
-
-    @ExperimentalCoroutinesApi
-    override val isFull: Boolean
-        get() = true
 
     override val onSend: SelectClause2<Message, SendChannel<Message>>
         get() = innerDFAgent.onSend
@@ -72,7 +68,7 @@ class AgentManagementSystemImpl(
     @ExperimentalCoroutinesApi
     override fun invokeOnClose(handler: (cause: Throwable?) -> Unit) = innerDFAgent.invokeOnClose(handler)
 
-    override fun offer(element: Message): Boolean = innerDFAgent.offer(element)
+    override fun trySend(element: Message): ChannelResult<Unit> = innerDFAgent.trySend(element)
 
     override suspend fun send(element: Message) = innerDFAgent.send(element)
 
@@ -80,4 +76,7 @@ class AgentManagementSystemImpl(
         send(Message(innerDFAgent.identifier, innerDFAgent.identifier, code = AgentPlatform.CODE_REGISTRATION))
     }
 
+    fun setInnerDFAgent(agent: BaseDFAgent) {
+        this.innerDFAgent = agent
+    }
 }

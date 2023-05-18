@@ -1,0 +1,4 @@
+platform:
+  count: 5
+  name: PC
+  param: 15

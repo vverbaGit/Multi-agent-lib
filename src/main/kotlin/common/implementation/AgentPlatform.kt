@@ -2,18 +2,16 @@ package common.implementation
 
 import common.interfaces.AgentManagementSystem
 import common.interfaces.MessageTransportService
-import common.message.Message
 import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.BroadcastChannel
-import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlin.coroutines.CoroutineContext
 
 object AgentPlatform : CoroutineScope {
 
     const val CODE_REGISTRATION = 101
 
-    val messageTransportService: MessageTransportService = MessageTransportServiceImpl(
-        BroadcastChannel(Channel.CONFLATED)
+    private val messageTransportService: MessageTransportService = MessageTransportServiceImpl(
+        MutableSharedFlow()
     )
 
     private val superVisorJob = SupervisorJob()

@@ -1,7 +1,6 @@
 package common.interfaces
 
 import common.message.Message
-import kotlinx.coroutines.channels.BroadcastChannel
+import kotlinx.coroutines.flow.SharedFlow
 
-
-interface MessageTransportService : BroadcastChannel<Message>
+interface MessageTransportService : SharedFlow<Message>

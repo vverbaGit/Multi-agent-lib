@@ -1,6 +1,6 @@
 package common.message
 
-data class Message constructor(
+data class Message (
     val senderId: String,
     val receiverId: String,
     val data: Any? = null,

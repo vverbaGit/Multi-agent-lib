@@ -1,10 +1,11 @@
 buildscript {
-    ext.kotlin_version = '1.3.61'
+    ext.kotlin_version = '1.8.20'
 }
 
 plugins {
     id 'java'
-    id 'org.jetbrains.kotlin.jvm' version '1.3.61'
+    id 'org.jetbrains.kotlin.jvm' version '1.8.20'
+    id 'org.jetbrains.kotlinx.kover' version '0.6.1'
 }
 
 group 'org.science.khpi'
@@ -18,19 +19,28 @@ repositories {
 }
 
 ext {
-    version_coroutine_core = '1.3.3'
+    version_coroutine_core = '1.7.1'
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$version_coroutine_core"
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$version_coroutine_core")
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
+    implementation("org.junit.jupiter:junit-jupiter:5.8.1")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.15.1")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.15.1")
 
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testImplementation("io.mockk:mockk:1.13.5")
 }
 
 compileKotlin {
     kotlinOptions.jvmTarget = "1.8"
 }
+
 compileTestKotlin {
     kotlinOptions.jvmTarget = "1.8"
+}
+
+test {
+    useJUnitPlatform()
 }
