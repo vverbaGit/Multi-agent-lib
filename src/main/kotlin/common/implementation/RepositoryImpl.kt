@@ -5,7 +5,7 @@ import java.util.*
 
 class RepositoryImpl<T> : Repository<T> {
 
-    val list = mutableListOf<T>();
+    private val list = mutableListOf<T>()
 
     override fun save(t: T): T {
         list.add(t)
