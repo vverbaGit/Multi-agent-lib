@@ -14,6 +14,15 @@ import kotlinx.coroutines.selects.SelectClause2
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration
 
+/**
+ * Agent management system impl
+ *
+ * @property messageTransportService
+ * @property name
+ * @property coroutineContext
+ * @property capacity
+ * @constructor Create empty Agent management system impl
+ */
 class AgentManagementSystemImpl(
     override val messageTransportService: MessageTransportService,
     override val name: String,
@@ -72,10 +81,19 @@ class AgentManagementSystemImpl(
 
     override suspend fun send(element: Message) = innerDFAgent.send(element)
 
+    /**
+     * Register
+     *
+     */
     suspend fun register() {
         send(Message(innerDFAgent.identifier, innerDFAgent.identifier, code = AgentPlatform.CODE_REGISTRATION))
     }
 
+    /**
+     * Set inner d f agent
+     *
+     * @param agent
+     */
     fun setInnerDFAgent(agent: BaseDFAgent) {
         this.innerDFAgent = agent
     }

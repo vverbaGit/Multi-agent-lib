@@ -3,6 +3,12 @@ package common.implementation
 import common.interfaces.Repository
 import java.util.*
 
+/**
+ * Repository impl
+ *
+ * @param T
+ * @constructor Create empty Repository impl
+ */
 class RepositoryImpl<T> : Repository<T> {
 
     private val list = mutableListOf<T>()

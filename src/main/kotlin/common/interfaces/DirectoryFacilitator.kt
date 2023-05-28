@@ -6,6 +6,14 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.datetime.Clock
 import kotlin.time.Duration
 
+/**
+ * A Directory Facilitator is an optional component of the AP, but if it is present,
+ * it must be implemented as a DF service.
+ * The DF provides yellow pages services to other agents.
+ * Agents may register their services with the DF or query the DF to find out what services are offered by other agents.
+ * Multiple DFs may exist within an AP and may be federated.
+ *
+ */
 interface DirectoryFacilitator : Agent {
 
     suspend fun onPathUnresolved(message: Message)

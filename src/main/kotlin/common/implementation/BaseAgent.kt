@@ -15,6 +15,16 @@ import kotlinx.coroutines.channels.actor
 import kotlinx.coroutines.selects.SelectClause2
 import kotlin.coroutines.CoroutineContext
 
+/**
+ * Base agent
+ *
+ * @property name
+ * @property behaviour
+ * @property coroutineContext
+ * @property capacity
+ * @property parent
+ * @constructor Create empty Base agent
+ */
 abstract class BaseAgent internal constructor(
     override val name: String,
     private val behaviour: BehaviourWithRepository,
@@ -53,6 +63,17 @@ abstract class BaseAgent internal constructor(
     override val identifier: String
         get() = "${parent.identifier}@$name"
 
+    /**
+     * Agent impl
+     *
+     * @constructor
+     *
+     * @param name
+     * @param behaviour
+     * @param coroutineContext
+     * @param capacity
+     * @param parent
+     */
     internal class AgentImpl(
         name: String,
         behaviour: BehaviourWithRepository,

@@ -10,6 +10,15 @@ import java.util.*
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration
 
+/**
+ * Base d f agent
+ *
+ * @property name
+ * @property coroutineContext
+ * @property capacity
+ * @property parent
+ * @constructor Create empty Base d f agent
+ */
 abstract class BaseDFAgent internal constructor(
     override val name: String,
     final override val coroutineContext: CoroutineContext,
@@ -94,6 +103,16 @@ abstract class BaseDFAgent internal constructor(
         trySend(message).getOrNull()
     }
 
+    /**
+     * D f agent impl
+     *
+     * @constructor
+     *
+     * @param name
+     * @param coroutineContext
+     * @param capacity
+     * @param parent
+     */
     internal class DFAgentImpl(
         name: String,
         coroutineContext: CoroutineContext,
