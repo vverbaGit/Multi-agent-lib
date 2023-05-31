@@ -1,4 +1,8 @@
-platform:
-  count: 5
-  name: PC
-  param: 15
+-   count: 50
+    name: consumers
+    param: 20
+    behavior: common.test.ConsumerAgentBehaviour
+-   count: 50
+    name: producers
+    param: 20
+    behavior: common.test.ProducerAgentBehavior

@@ -5,10 +5,11 @@ import com.fasterxml.jackson.databind.exc.MismatchedInputException
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.fasterxml.jackson.module.kotlin.KotlinFeature
 import com.fasterxml.jackson.module.kotlin.KotlinModule
+import com.fasterxml.jackson.module.kotlin.readValue
 import java.nio.file.Files
 import java.nio.file.Paths
 
-fun parse(): Configuration {
+fun parse(): List<AgentConfig> {
     val path = Paths.get("src/main/resources/", "application.yaml")
     val mapper = ObjectMapper(YAMLFactory())
     mapper.registerModule(
@@ -21,9 +22,10 @@ fun parse(): Configuration {
             .build()
     )
 
+
     return try {
         Files.newBufferedReader(path).use {
-            mapper.readValue(it, Configuration::class.java)
+            mapper.readValue<List<AgentConfig>>(it)
         }
     } catch (exception: MismatchedInputException) {
         println("Could not read YAML file!")

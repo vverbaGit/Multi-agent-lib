@@ -1,31 +1,26 @@
 package common.test
 
 import common.implementation.AgentPlatform
+import common.interfaces.BehaviourWithRepository
 import common.utils.parse
+import kotlin.reflect.full.primaryConstructor
 
 fun main() {
 
-    val agentPlatform = parse().platform
 
     AgentPlatform.initialize("PC") {
 
-        df("producers") {
-            for (i in 0..agentPlatform.count) {
-                val param = -15f + 20f * Math.random().toFloat()
-                agent(
-                    name = "${System.nanoTime()} param: $param",
-                    behaviour = ProducerAgentBehavior(param)
-                )
-            }
-        }
+        for (agentConfig in parse()) {
 
-        df("consumers") {
-            for (i in 0..agentPlatform.count) {
-                val param = -15f + 20f * Math.random().toFloat()
-                agent(
-                    name = "${System.nanoTime()} param: $param",
-                    behaviour = ConsumerAgentBehaviour(param)
-                )
+            df(agentConfig.name) {
+                for (i in 0..agentConfig.count) {
+                    val param = -15f + agentConfig.param * Math.random().toFloat()
+                    val primaryConstructor = Class.forName(agentConfig.behavior).kotlin.primaryConstructor!!
+                    agent(
+                        name = "${System.nanoTime()} param: $param",
+                        behaviour = primaryConstructor.call(param) as BehaviourWithRepository
+                    )
+                }
             }
         }
     }

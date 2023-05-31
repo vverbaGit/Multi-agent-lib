@@ -9,12 +9,11 @@ import common.interfaces.DirectoryFacilitator
 import common.message.Message
 
 class ConsumerAgentBehaviour<T>(
-    x: T,
-    checker: MutableList<Check<Any>> = mutableListOf(
-        MoreCheck(3f + Math.random().toFloat() * 3f),
-        LessCheck(-3f - Math.random().toFloat() * 3f)
-    )
-) : AbstractAgentBehavior<T>(x, checker) {
+    x: T
+) : AbstractAgentBehavior<T>(x, mutableListOf(
+    MoreCheck(3f + Math.random().toFloat() * 3f),
+    LessCheck(-3f - Math.random().toFloat() * 3f)
+)) {
 
     override suspend fun onReceive(message: Message, agent: Agent, mts: DirectoryFacilitator) {
         if (message.code == AgentPlatform.CODE_REGISTRATION) {
