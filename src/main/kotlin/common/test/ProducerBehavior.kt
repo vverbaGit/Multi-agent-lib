@@ -2,7 +2,6 @@ package common.test
 
 import common.implementation.check.LessCheck
 import common.implementation.check.MoreCheck
-import common.interfaces.Check
 import common.interfaces.DirectoryFacilitator
 import java.lang.Math.random
 

@@ -4,7 +4,6 @@ import common.implementation.AgentPlatform
 import common.implementation.check.LessCheck
 import common.implementation.check.MoreCheck
 import common.interfaces.Agent
-import common.interfaces.Check
 import common.interfaces.DirectoryFacilitator
 import common.message.Message
 

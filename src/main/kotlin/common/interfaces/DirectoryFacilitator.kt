@@ -1,7 +1,6 @@
 package common.interfaces
 
 import common.message.Message
-import common.utils.DURATION_INFINITE
 import kotlinx.coroutines.channels.Channel
 import kotlinx.datetime.Clock
 import kotlin.time.Duration
@@ -30,14 +29,14 @@ interface DirectoryFacilitator : Agent {
     suspend fun agent(
         name: String = "${Clock.System.now().toEpochMilliseconds()}",
         capacity: Int = Channel.CONFLATED,
-        lifecycle: Duration = DURATION_INFINITE,
+        lifecycle: Duration = Duration.INFINITE,
         behaviour: BehaviourWithRepository
     )
 
     suspend fun agent(
         name: String = "${Clock.System.now().toEpochMilliseconds()}",
         capacity: Int = Channel.CONFLATED,
-        lifecycle: Duration = DURATION_INFINITE,
+        lifecycle: Duration = Duration.INFINITE,
         block: suspend Agent.(Message, DirectoryFacilitator) -> Unit
     ) {
         val behaviour = BehaviourWithRepository { message, agent, mts -> agent.block(message, mts) }
