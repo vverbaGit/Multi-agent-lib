@@ -36,7 +36,7 @@ abstract class BaseDFAgent internal constructor(
         }
     }
 
-    private val children = mutableMapOf<String, Agent>()
+    public val children = mutableMapOf<String, Agent>()
 
     override val identifier: String
         get() = "${parent.identifier}@$name"
