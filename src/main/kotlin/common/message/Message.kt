@@ -1,6 +1,16 @@
 package common.message
 
-data class Message constructor(
+/**
+ * Message
+ *
+ * @property senderId
+ * @property receiverId
+ * @property data
+ * @property code
+ * @property timestamp
+ * @constructor Create empty Message
+ */
+data class Message (
     val senderId: String,
     val receiverId: String,
     val data: Any? = null,

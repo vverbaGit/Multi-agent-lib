@@ -2,8 +2,15 @@ package common.implementation
 
 import common.interfaces.MessageTransportService
 import common.message.Message
-import kotlinx.coroutines.channels.BroadcastChannel
+import kotlinx.coroutines.flow.SharedFlow
 
+/**
+ * Message transport service impl
+ *
+ * @constructor
+ *
+ * @param broadcastChannel
+ */
 class MessageTransportServiceImpl(
-    broadcastChannel: BroadcastChannel<Message>
-) : MessageTransportService, BroadcastChannel<Message> by broadcastChannel
+    broadcastChannel: SharedFlow<Message>
+) : MessageTransportService, SharedFlow<Message> by broadcastChannel

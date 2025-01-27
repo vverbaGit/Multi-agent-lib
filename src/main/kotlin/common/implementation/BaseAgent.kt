@@ -2,38 +2,51 @@ package common.implementation
 
 import common.interfaces.Agent
 import common.interfaces.Behaviour
+import common.interfaces.BehaviourWithRepository
 import common.interfaces.DirectoryFacilitator
 import common.message.Message
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ChannelResult
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.channels.actor
 import kotlinx.coroutines.selects.SelectClause2
 import kotlin.coroutines.CoroutineContext
 
+/**
+ * Base agent
+ *
+ * @property name
+ * @property behaviour
+ * @property coroutineContext
+ * @property capacity
+ * @property parent
+ * @constructor Create empty Base agent
+ */
 abstract class BaseAgent internal constructor(
     override val name: String,
-    val behaviour: Behaviour,
-    override val coroutineContext: CoroutineContext,
-    override val capacity: Int = Channel.CONFLATED,
+    private val behaviour: BehaviourWithRepository,
+    final override val coroutineContext: CoroutineContext,
+    final override val capacity: Int = Channel.CONFLATED,
     override val parent: DirectoryFacilitator
 ) : Agent, Behaviour by behaviour {
 
+    @OptIn(ObsoleteCoroutinesApi::class)
     private val agent = actor<Message>(
         context = coroutineContext,
         capacity = capacity
     ) {
         for (message in channel) {
-            behaviour.onReceive(message, this@BaseAgent, parent)
+            behaviour.onReceiveWithRepo(message, this@BaseAgent, parent)
         }
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     @ExperimentalCoroutinesApi
     override val isClosedForSend: Boolean
         get() = agent.isClosedForSend
-
-    @ExperimentalCoroutinesApi
-    override val isFull: Boolean = false
 
     override val onSend: SelectClause2<Message, SendChannel<Message>>
         get() = agent.onSend
@@ -43,16 +56,27 @@ abstract class BaseAgent internal constructor(
     @ExperimentalCoroutinesApi
     override fun invokeOnClose(handler: (cause: Throwable?) -> Unit) = agent.invokeOnClose(handler)
 
-    override fun offer(element: Message): Boolean = agent.offer(element)
+    override fun trySend(element: Message): ChannelResult<Unit> = agent.trySend(element)
 
     override suspend fun send(element: Message) = agent.send(element)
 
     override val identifier: String
         get() = "${parent.identifier}@$name"
 
+    /**
+     * Agent impl
+     *
+     * @constructor
+     *
+     * @param name
+     * @param behaviour
+     * @param coroutineContext
+     * @param capacity
+     * @param parent
+     */
     internal class AgentImpl(
         name: String,
-        behaviour: Behaviour,
+        behaviour: BehaviourWithRepository,
         coroutineContext: CoroutineContext,
         capacity: Int = Channel.CONFLATED,
         parent: DirectoryFacilitator
